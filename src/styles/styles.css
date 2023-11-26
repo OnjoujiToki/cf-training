@@ -1,0 +1,209 @@
+/* Transition for problem list */
+.problem-list-enter {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  
+  .problem-list-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .problem-list-exit {
+    opacity: 1;
+  }
+  
+  .problem-list-exit-active {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  /* Pagination Styles */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .page-item {
+    margin: 0 5px;
+  }
+  
+  .page-link {
+    border: 1px solid #dddddd;
+    padding: 5px 10px;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .page-link:hover {
+    background-color: #eeeeee;
+  }
+  
+  .problem-list-container {
+    max-width: 1200px; /* Or whatever maximum width you prefer */
+    margin: 0 auto; /* This centers the div */
+    padding: 20px; /* This adds some space inside the container */
+    background-color: #f8f9fa; /* Optional: sets a background color for the list */
+    border-radius: 10px; /* Optional: rounds the corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+  }
+  /* Problem Styles */
+  .problem {
+    padding: 12px;
+    margin: 5px 0;
+    border: 2px solid; /* The color will be set inline */
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease; /* Smooth background transition */
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .problem-details {
+    display: flex;
+    justify-content: space-between; /* Space out children */
+    align-items: center; /* Align children vertically */
+  }
+  
+  .problem-id,
+  .problem-name {
+    flex-grow: 1; /* Allow these elements to grow and take up space */
+  }
+  
+  .problem.solved {
+    background-color: #d4edda; /* A light green background for solved problems */
+  }
+  
+  .problem-link {
+    text-decoration: none; /* Remove underline from links */
+    color: inherit; /* Inherit text color from parent */
+  }
+  
+  .problem-id {
+    font-weight: bold;
+  }
+  
+  .problem-name {
+    margin-left: 10px;
+  }
+  
+  .problem-rating {
+    margin-left: 10px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  
+  .problem-tag {
+    background-color: #ffffff; /* White background for the card */
+    color: #333333; /* Dark text for contrast */
+    padding: 4px 8px; /* Padding inside the card */
+    margin: 4px; /* Space between cards */
+    border: 1px solid #dddddd; /* Border for the card */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 4px; /* Slightly rounded corners for the card */
+    font-size: 0.85em; /* Slightly smaller font size */
+    display: inline-block; /* Treat the span like an inline-block */
+    max-width: calc(100% - 8px); /* Ensure it doesn't overflow the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    cursor: default; /* Change cursor to default to indicate it's not a link */
+  }
+  .problem-link:hover .problem {
+    background-color: #f0f0f0; /* Example hover effect */
+  }
+  
+  /* Pagination Style */
+  .pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #333333; /* Adjust the background color as needed */
+    color: white;
+  }
+  
+  .pagination-container button {
+    background: none;
+    border: 1px solid #ffffff;
+    color: white;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+  
+  .pagination-container button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination-container button:hover:not(:disabled) {
+    background: #ffffff;
+    color: #333333;
+  }
+  
+  .pagination-container span {
+    margin: 0 15px;
+  }
+  
+  .pagination-container input,
+  .pagination-container select {
+    margin: 0 5px;
+    padding: 5px;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #dddddd;
+  }
+  
+  .pagination-container input {
+    width: 50px;
+    text-align: center;
+  }
+  
+  /* Class for current page number styling if needed */
+  .current-page {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  
+  /* Style adjustments for mobile responsiveness */
+  @media (max-width: 768px) {
+    .pagination-container {
+      flex-direction: column;
+    }
+    .pagination-container span,
+    .pagination-container input,
+    .pagination-container select {
+      margin-bottom: 10px;
+    }
+  }
+  
+  /* NavBar*/
+  .navbar {
+    font-size: 30px;
+    background-color: #333333;
+    color: white;
+    padding: 25px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px; /* Add this line to make the corners rounded */
+  }
+  
+  .navbar a {
+    color: white;
+    padding: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .navbar a:hover {
+    text-decoration: underline;
+  }
+  
