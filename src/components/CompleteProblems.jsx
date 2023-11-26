@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ProblemList from "./ProblemList";
 import Pagination from "./Pagination";
+import { collection, doc, setDoc,query, where, getDocs } from 'firebase/firestore';
+import { db } from "../config/firebase";
 // import './App.css';
 
 const ALL_PROBLEMS_URL =
@@ -17,23 +19,31 @@ function CompleteProblems() {
     setShowTags(!showTags);
   };
   useEffect(() => {
-    // Fetch problems when the component mounts or userHandle changes
-      fetch(ALL_PROBLEMS_URL)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status === "OK") {
-            setProblems(data.result.problems);
-            setIsLoaded(true);
-          }
-        });
+    fetch(ALL_PROBLEMS_URL)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "OK") {
+          /*const problemsCollection = collection(db, 'problems');
+          //I FORGOT to CHECK here
+          data.result.problems.forEach(async (problem) => {
+            const problemId = `${problem.contestId}${problem.index}`;
+            const problemDoc = doc(problemsCollection, problemId);
+            const problemData = {
+              id: problemId,
+              name: problem.name,
+              rating: problem.rating,
+              tags: problem.tags,
+            };
+            await setDoc(problemDoc, problemData);
+          });*/
+          setProblems(data.result.problems);
+          setIsLoaded(true);
+        }
+      });
   
   }, [userHandle]);
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
-
-  const handleUserHandleSubmit = (handle) => {
-    setUserHandle(handle);
-  };
 
   // Calculate the current problems to display
   const indexOfLastProblem = currentPage * problemsPerPage;
@@ -48,7 +58,7 @@ function CompleteProblems() {
       <button onClick={toggleTagsVisibility}>
         {showTags ? 'Hide All Tags' : 'Show All Tags'}
       </button>
-      {isLoaded && <ProblemList problems={currentProblems} showTags={showTags} />}
+      {isLoaded && <ProblemList problems={currentProblems} showTags={showTags} listName={"Codeforces Problem"}/>}
       {isLoaded && (
         <Pagination
           currentPage={currentPage}

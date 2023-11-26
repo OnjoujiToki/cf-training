@@ -27,14 +27,14 @@ const Problem = ({ problem, isSolved, showTags }) => {
       >
         <div className="problem-details">
           <div className="problem-info">
-            <span className="problem-id">{`${problem.contestId}${problem.index}`}</span>
+            <span className="problem-id">{problem.id ? problem.id : `${problem.contestId}${problem.index}`}</span>
             <span className="problem-name">{problem.name}</span>
           </div>
           <span className="problem-rating" style={{ color: difficultyColor }}>
             {problem.rating}
           </span>
         </div>
-        {showTags && (
+        {showTags && problem.tags && (
           <div className="problem-tags">
             {problem.tags.map((tag, index) => (
               <span key={index} className="problem-tag">
