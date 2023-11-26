@@ -32,3 +32,33 @@
     cursor: pointer;
     width: 100%;
   }
+
+  /* ... existing styles ... */
+
+.google-login-btn {
+  background-color: #db4437; /* Google's red color */
+  color: white;
+  /* Add other styles as needed */
+}
+.google-login-btn:hover {
+  background-color: #c53727;
+}
+.google-login-btn:active {
+  background-color: #b03525;
+}
+.google-login-btn:focus {
+  outline: none;
+}
+.google-login-btn:disabled {
+  background-color: #db443780;
+  cursor: not-allowed;
+}
+.google-login-btn:disabled:hover {
+  background-color: #db443780;
+}
+.google-login-btn:disabled:active {
+  background-color: #db443780;
+}
+.google-login-btn:disabled:focus {
+  outline: none;
+}
