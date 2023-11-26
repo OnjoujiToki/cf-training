@@ -25,26 +25,33 @@ function PlanDetail() {
     
       const fetchedProblems = await Promise.all(
         planData.problems.map(async (problemKey) => {
-          const response = await fetch(`https://codeforces.com/api/problemset.problems?tags=${problemKey}`);
-          const data = await response.json();
-          return data.result.problems[0]; // Assuming each key returns a single problem
+          // First, try to fetch the problem from the database
+          const problemRef = doc(db, "problems", problemKey);
+          const problemSnap = await getDoc(problemRef);
+
+          if (problemSnap.exists()) {
+            // Problem found in the database
+            console.log("Problem found in the database");
+            console.log(problemSnap.data());
+            return problemSnap.data();
+          } else {
+            console.log("ERROR getting the problem rom the database")
+           }
         })
-       
       );
 
       setProblemDetails(fetchedProblems);
-     
     };
 
     fetchPlan();
   }, [planId]);
 
   if (!plan) return <div>Loading...</div>;
-  console.log(problemDetails);
+  
   return (
     <div className="plan-detail-container">
-      <h2>Plan: {plan.name}</h2>
-      <ProblemList problems={problemDetails} showTags={true} />
+    
+      <ProblemList problems={problemDetails} showTags={true} listName={plan.name} />
     </div>
   );
 }

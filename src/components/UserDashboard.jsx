@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Button, Input, ListGroup, ListGroupItem } from 'reactstrap';
 import RecentSolvedProblems from "./DashboardComponents/RecentSolvedProblems";
 import SolveCount from './DashboardComponents/SolveCount';
 import HandleManager from "./DashboardComponents/HandleManager";
@@ -132,12 +133,22 @@ function UserDashboard() {
   
 
   return (
-    <div>
-      <h2>User Dashboard</h2>
-      <HandleManager handles={handles} newHandle={newHandle} setNewHandle={setNewHandle} addHandle={addHandle}/>
-      <SolveCount totalProblemsSolved = {totalProblemsSolved} updateProblemCount={updateTotalProblemsSolved}/>
-      <RecentSolvedProblems recentProblems={recentProblems} />
-    </div>
+    <Container fluid>
+      <h2 className="my-4">User Dashboard</h2>
+      <Row>
+        <Col md={6}>
+          <HandleManager handles={handles} newHandle={newHandle} setNewHandle={setNewHandle} addHandle={addHandle}/>
+        </Col>
+        <Col md={6}>
+          <SolveCount totalProblemsSolved={totalProblemsSolved} updateProblemCount={updateTotalProblemsSolved} />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <RecentSolvedProblems recentProblems={recentProblems} />
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

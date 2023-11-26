@@ -58,7 +58,7 @@ function CompleteProblems() {
       <button onClick={toggleTagsVisibility}>
         {showTags ? 'Hide All Tags' : 'Show All Tags'}
       </button>
-      {isLoaded && <ProblemList problems={currentProblems} showTags={showTags} />}
+      {isLoaded && <ProblemList problems={currentProblems} showTags={showTags} listName={"Codeforces Problem"}/>}
       {isLoaded && (
         <Pagination
           currentPage={currentPage}
