@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import RecentSolvedProblems from "./DashboardComponents/RecentSolvedProblems";
+import SolveCount from './DashboardComponents/SolveCount';
+import HandleManager from "./DashboardComponents/HandleManager";
 
 function UserDashboard() {
   const [handles, setHandles] = useState([]);
@@ -15,7 +18,7 @@ function UserDashboard() {
         userSubmissions.forEach((submission) => {
           if (submission.verdict === "OK") {
             recentSolvedProblems.push({
-              problemId: `${submission.problem.contestId}-${submission.problem.index}`,
+              problemId: `${submission.problem.contestId}${submission.problem.index}`,
               name: submission.problem.name,
               solvedAt: submission.creationTimeSeconds,
               handle: submission.author.members[0].handle
@@ -61,6 +64,7 @@ function UserDashboard() {
       return [];
     }
   };
+
   const aggregateProblemsForAllHandles = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
@@ -98,13 +102,12 @@ function UserDashboard() {
   };
 
   const addHandle = async () => {
-    // Avoid duplicate handles
     if (handles.includes(newHandle)) {
       alert("Handle already exists");
       return;
     }
 
-    // Check if the handle is valid
+
     const valid = await isHandleValid(newHandle);
     if (!valid) {
       alert("Invalid Codeforces handle");
@@ -131,33 +134,9 @@ function UserDashboard() {
   return (
     <div>
       <h2>User Dashboard</h2>
-      <div>
-        <input
-          type="text"
-          value={newHandle}
-          onChange={(e) => setNewHandle(e.target.value)}
-          placeholder="Add Codeforces handle"
-        />
-        <button onClick={addHandle}>Add Handle</button>
-      </div>
-      <div>
-        <h3>Codeforces Handles:</h3>
-        <ul>
-          {handles.map((handle, index) => (
-            <li key={index}>{handle}</li>
-          ))}
-        </ul>
-      </div>
-      <button onClick={updateTotalProblemsSolved}>Update Problem Count</button>
-      <p>Total Problems Solved: {totalProblemsSolved}</p>
-      <h3>Recent Solved Problems:</h3>
-      <ul>
-        {recentProblems.map((problem, index) => (
-          <li key={index}>
-            {problem.name} (ID: {problem.problemId}) by {problem.handle}
-          </li>
-        ))}
-      </ul>
+      <HandleManager handles={handles} newHandle={newHandle} setNewHandle={setNewHandle} addHandle={addHandle}/>
+      <SolveCount totalProblemsSolved = {totalProblemsSolved} updateProblemCount={updateTotalProblemsSolved}/>
+      <RecentSolvedProblems recentProblems={recentProblems} />
     </div>
   );
 }

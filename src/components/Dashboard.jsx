@@ -18,7 +18,8 @@ function Dashboard() {
   const handleToggle = () => {
     setIsRegister(!isRegister);
   };
-
+  console.log('isLoggedIn:', isLoggedIn);
+  console.log(auth.currentUser?.uid);
   return isLoggedIn ? (
     <UserDashboard />
   ) : (

@@ -1,23 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { auth } from './config/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import CompleteProblems from "./components/CompleteProblems";
 import "./styles/styles.css";
 import NavBar from './components/NavBar';
 import Dashboard from './components/Dashboard';
 import Training from './components/Training';
+import PlanDetail from './components/TrainingComponents/PlanDetail';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-function App({ signOut, user }) {
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setIsLoggedIn(!!user);
+    });
+    return unsubscribe; // Cleanup subscription
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <>
-      <NavBar />
-     
+      <NavBar isLoggedIn={isLoggedIn} onSignOut={handleSignOut} />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} /> {/* Redirect from / to /home */}
-        <Route path="/home" element={<Dashboard />} /> 
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<Dashboard />} />
         <Route path="/problem" element={<CompleteProblems />} />
         <Route path="/training" element={<Training />} />
+        <Route path="/plan/:planId" element={<PlanDetail />} />
         {/* other routes as needed */}
       </Routes>
     </>

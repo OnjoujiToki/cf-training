@@ -34,7 +34,7 @@ const Problem = ({ problem, isSolved, showTags }) => {
             {problem.rating}
           </span>
         </div>
-        {showTags && (
+        {showTags && problem.tags && (
           <div className="problem-tags">
             {problem.tags.map((tag, index) => (
               <span key={index} className="problem-tag">
