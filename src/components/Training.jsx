@@ -10,7 +10,6 @@ function Training() {
   const [userPlans, setUserPlans] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const handleNewPlan = () => {
- 
     navigate('/create-plan'); 
   };
   const navigate = useNavigate();
