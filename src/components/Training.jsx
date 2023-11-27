@@ -9,10 +9,27 @@ function Training() {
   const [publicPlans, setPublicPlans] = useState([]);
   const [userPlans, setUserPlans] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const navigate = useNavigate();
   const handleNewPlan = () => {
     navigate('/create-plan'); 
   };
-  const navigate = useNavigate();
+  const fetchUserPlans = async (userId) => {
+    try {
+      const userDocRef = doc(db, "users", userId);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists() && userDocSnap.data().plans) {
+        const userPlansPromises = userDocSnap.data().plans.map(planId => getDoc(doc(db, "plans", planId)));
+        const userPlansSnapshots = await Promise.all(userPlansPromises);
+        return userPlansSnapshots.map(snap => ({ id: snap.id, ...snap.data() }));
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching user plans:", error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       setIsLoggedIn(!!user);
@@ -23,7 +40,6 @@ function Training() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        // Fetch public plans
         const publicPlansQuery = query(collection(db, "plans"), where("private", "==", false));
         const publicPlansSnapshot = await getDocs(publicPlansQuery);
         const fetchedPublicPlans = [];
@@ -31,25 +47,11 @@ function Training() {
           fetchedPublicPlans.push({ id: doc.id, ...doc.data() });
         });
         setPublicPlans(fetchedPublicPlans);
-
-        // Fetch user-specific plans if user is logged in
         if (currentUser) {
-          // const userDocRef = doc(db, "users", currentUser.uid);
-          const userDocRef = doc(db, "users", "2JKFYqGxS12SfkiqN3Pq");
-          const userDocSnap = await getDoc(userDocRef);
-          console.log(userDocSnap.data().plan);
-          if (userDocSnap.exists() && userDocSnap.data().plan) {
-            const userPlansPromises = userDocSnap.data().plan.map((planId) => {
-              console.log(planId);
-              return getDoc(doc(db, "plans", planId));
-            });
-            /*
-            const userPlansSnapshots = await Promise.all(userPlansPromises);
-            const fetchedUserPlans = userPlansSnapshots.map((snap, index) => {
-              return { id: snap.id, ...snap.data() }; // Assuming the plan has a name property
-            });
-            setUserPlans(fetchedUserPlans);*/
-          }
+          const userPlans = await fetchUserPlans(currentUser.uid);
+          
+          setUserPlans(userPlans);
+          
         }
       } catch (error) {
         console.error("Error fetching plans:", error);
@@ -58,6 +60,7 @@ function Training() {
 
     fetchPlans();
   }, [currentUser]);
+
   const handlePlanClick = (planId) => {
     navigate(`/plan/${planId}`);
   };
@@ -89,9 +92,9 @@ function Training() {
             </CardHeader>
             <CardBody>
               <ListGroup flush>
-                {userPlans.map((planId, index) => (
-                  <ListGroupItem key={index} tag="button" action onClick={() => handlePlanClick(planId)}>
-                    Plan {index + 1}
+                {userPlans.map((plan) => (
+                  <ListGroupItem key={plan.id} tag="button" action onClick={() => handlePlanClick(plan.id)}>
+                    {plan.name}
                   </ListGroupItem>
                 ))}
               </ListGroup>

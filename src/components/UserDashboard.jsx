@@ -13,7 +13,7 @@ function UserDashboard() {
   
   const fetchRecentSolvedProblems = async (handles) => {
     try {
-      const allPromises = handles.map((handle) => fetchProblemsForHandle(handle));
+      const allPromises = handles.map((handle) => fetchTenProblemsForHandle(handle));
       const allResults = await Promise.all(allPromises);
 
       let recentSolvedProblems = [];
@@ -67,11 +67,50 @@ function UserDashboard() {
       return [];
     }
   };
+  const fetchTenProblemsForHandle = async (handle) => {
+    try {
+      const response = await fetch(
+        `https://codeforces.com/api/user.status?handle=${handle}&from=1&count=10`,
+      );
+      const data = await response.json();
+      if (data.status !== "OK") {
+        throw new Error("Failed to fetch data");
+      }
+      return data.result;
+    } catch (error) {
+      console.error("Error fetching problems for handle:", handle, error);
+      return [];
+    }
+  };
 
   const aggregateProblemsForAllHandles = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
         fetchProblemsForHandle(handle),
+      );
+      const allResults = await Promise.all(allPromises);
+
+      const solvedProblems = new Set();
+      allResults.forEach((userSubmissions) => {
+        userSubmissions.forEach((submission) => {
+          if (submission.verdict === "OK") {
+            const problemId = `${submission.problem.contestId}${submission.problem.index}`;
+            solvedProblems.add(problemId);
+          }
+        });
+      });
+
+      return solvedProblems.size;
+    } catch (error) {
+      console.error("Error aggregating problems:", error);
+      return 0;
+    }
+  };
+
+  const aggregateTenProblemsForAllHandles = async (handles) => {
+    try {
+      const allPromises = handles.map((handle) =>
+        fetchTenProblemsForHandle(handle),
       );
       const allResults = await Promise.all(allPromises);
 
@@ -106,7 +145,7 @@ function UserDashboard() {
     fetchUserHandles();
   }, []);
 
-  
+
   const isHandleValid = async (handle) => {
     try {
       const response = await fetch(

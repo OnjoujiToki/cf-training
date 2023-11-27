@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { doc, setDoc, collection, getDoc} from 'firebase/firestore';
+import { doc, setDoc, collection, getDoc, arrayUnion, updateDoc, serverTimestamp} from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
@@ -8,36 +8,48 @@ function CreatePlan() {
   const [problemIds, setProblemIds] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
 
-  const handleSavePlan = async () => {
-    if (!planName || !problemIds) {
-      alert('Please fill all the fields.');
-      return;
-    }
-
-    const problemsArray = problemIds.split(',').map(id => id.trim());
-    const validProblems = [];
-
-    for (const problemId of problemsArray) {
-      const problemRef = doc(db, "problems", problemId);
-      const problemSnap = await getDoc(problemRef);
-
-      if (problemSnap.exists()) {
-        validProblems.push(problemId);
+    const handleSavePlan = async () => {
+      if (!planName || !problemIds) {
+        alert('Please fill all the fields.');
+        return;
       }
-    }
-
-    const planData = {
-      name: planName,
-      problems: validProblems,
-      private: isPrivate,
-      author_id: auth.currentUser ? auth.currentUser.uid : "anonymous",
-      author_name: auth.currentUser ? (auth.currentUser.displayName || 'Anonymous') : "Anonymous",
+    
+      const problemsArray = problemIds.split(',').map(id => id.trim());
+      const validProblems = [];
+    
+      for (const problemId of problemsArray) {
+        const problemRef = doc(db, "problems", problemId);
+        const problemSnap = await getDoc(problemRef);
+    
+        if (problemSnap.exists()) {
+          validProblems.push(problemId);
+        }
+      }
+    
+      const planData = {
+        name: planName,
+        problems: validProblems,
+        private: isPrivate,
+        author_id: auth.currentUser ? auth.currentUser.uid : "anonymous",
+        author_name: auth.currentUser ? (auth.currentUser.displayName || 'Anonymous') : "Anonymous",
+        created_at: serverTimestamp(), // Add server timestamp
+      };
+    
+      // Save the plan
+      const newPlanRef = doc(collection(db, 'plans'));
+      await setDoc(newPlanRef, planData);
+    
+      // Update the user's document
+      if (auth.currentUser) {
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userDocRef, {
+          plans: arrayUnion(newPlanRef.id) // Add the new plan's ID to the user's plans array
+        });
+      }
+    
+      alert('Plan saved successfully!');
     };
-
-    const newPlanRef = doc(collection(db, 'plans'));
-    await setDoc(newPlanRef, planData);
-    alert('Plan saved successfully!');
-  };
+    
 
   return (
     <div>
