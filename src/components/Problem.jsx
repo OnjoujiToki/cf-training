@@ -12,7 +12,14 @@ const getDifficultyColor = (rating) => {
 
 const Problem = ({ problem, isSolved, showTags }) => {
   const difficultyColor = getDifficultyColor(problem.rating);
-  const problemUrl = `https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`;
+  let problemUrl = undefined;
+  if (problem.id == undefined) {
+    problemUrl = `https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`;
+  } else {
+    problemUrl = `https://codeforces.com/problemset/problem/${problem.id.slice(0, -1)}/${problem.id.slice(-1)}`;
+    console.log(problemUrl);
+  }
+  
 
   return (
     <a

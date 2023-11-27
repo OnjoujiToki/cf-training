@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ListGroup, ListGroupItem, Card, CardHeader, CardBody, Container, Row, Col } from 'reactstrap';
+import { ListGroup, ListGroupItem, Card, CardHeader, CardBody, Container, Row, Col, Button} from 'reactstrap';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,10 @@ function Training() {
   const [publicPlans, setPublicPlans] = useState([]);
   const [userPlans, setUserPlans] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const handleNewPlan = () => {
+ 
+    navigate('/create-plan'); 
+  };
   const navigate = useNavigate();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -81,8 +84,9 @@ function Training() {
         </Col>
         <Col md={6}>
           <Card>
-            <CardHeader className="bg-light">
-              <h3>My Training Plans</h3>
+          <CardHeader className="bg-light d-flex justify-content-between align-items-center">
+             <h3>My Training Plans</h3>
+              <Button color="primary" onClick={handleNewPlan}>Add New Plan</Button>
             </CardHeader>
             <CardBody>
               <ListGroup flush>

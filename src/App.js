@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard';
 import Training from './components/Training';
 import PlanDetail from './components/TrainingComponents/PlanDetail';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import CreatePlan from './components/TrainingComponents/CreatePlan';
 
 
 
@@ -41,6 +42,7 @@ function App() {
         <Route path="/problem" element={<CompleteProblems />} />
         <Route path="/training" element={<Training />} />
         <Route path="/plan/:planId" element={<PlanDetail />} />
+        <Route path="/create-plan" element={<CreatePlan />} />
         {/* other routes as needed */}
       </Routes>
     </>
