@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import '../styles/Login.css'; // Import the Login.css file
-import { auth } from '../config/firebase';
+import { auth, db } from '../config/firebase';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
+import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 function Login({ onRegisterClick }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

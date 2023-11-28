@@ -3,7 +3,9 @@ import { Container, Row, Col, Button, Input, ListGroup, ListGroupItem } from 're
 import RecentSolvedProblems from "./DashboardComponents/RecentSolvedProblems";
 import SolveCount from './DashboardComponents/SolveCount';
 import HandleManager from "./DashboardComponents/HandleManager";
-
+import { auth, db } from '../config/firebase';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 function UserDashboard() {
   const [handles, setHandles] = useState([]);
   const [newHandle, setNewHandle] = useState("");
@@ -11,7 +13,7 @@ function UserDashboard() {
   
   const fetchRecentSolvedProblems = async (handles) => {
     try {
-      const allPromises = handles.map((handle) => fetchProblemsForHandle(handle));
+      const allPromises = handles.map((handle) => fetchTenProblemsForHandle(handle));
       const allResults = await Promise.all(allPromises);
 
       let recentSolvedProblems = [];
@@ -65,6 +67,21 @@ function UserDashboard() {
       return [];
     }
   };
+  const fetchTenProblemsForHandle = async (handle) => {
+    try {
+      const response = await fetch(
+        `https://codeforces.com/api/user.status?handle=${handle}&from=1&count=10`,
+      );
+      const data = await response.json();
+      if (data.status !== "OK") {
+        throw new Error("Failed to fetch data");
+      }
+      return data.result;
+    } catch (error) {
+      console.error("Error fetching problems for handle:", handle, error);
+      return [];
+    }
+  };
 
   const aggregateProblemsForAllHandles = async (handles) => {
     try {
@@ -89,6 +106,46 @@ function UserDashboard() {
       return 0;
     }
   };
+
+  const aggregateTenProblemsForAllHandles = async (handles) => {
+    try {
+      const allPromises = handles.map((handle) =>
+        fetchTenProblemsForHandle(handle),
+      );
+      const allResults = await Promise.all(allPromises);
+
+      const solvedProblems = new Set();
+      allResults.forEach((userSubmissions) => {
+        userSubmissions.forEach((submission) => {
+          if (submission.verdict === "OK") {
+            const problemId = `${submission.problem.contestId}${submission.problem.index}`;
+            solvedProblems.add(problemId);
+          }
+        });
+      });
+
+      return solvedProblems.size;
+    } catch (error) {
+      console.error("Error aggregating problems:", error);
+      return 0;
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserHandles = async () => {
+      if (auth.currentUser) {
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setHandles(userDocSnap.data().handles || []);
+        }
+      }
+    };
+
+    fetchUserHandles();
+  }, []);
+
+
   const isHandleValid = async (handle) => {
     try {
       const response = await fetch(
@@ -101,27 +158,43 @@ function UserDashboard() {
       return false; // If an error occurs, assume the handle is not valid
     }
   };
-
-  const addHandle = async () => {
-    if (handles.includes(newHandle)) {
-      alert("Handle already exists");
+  const addHandle = async (newHandle) => {
+    if (!newHandle) {
+      alert('Please enter a handle');
       return;
     }
 
-
-    const valid = await isHandleValid(newHandle);
-    if (!valid) {
-      alert("Invalid Codeforces handle");
+    if (!auth.currentUser) {
+      alert('No user logged in');
       return;
     }
-
-    if (handles.length < 10) {
-      setHandles([...handles, newHandle]);
-      setNewHandle("");
+    console.log('Adding handle:', newHandle);
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
+    const userDocSnap = await getDoc(userDocRef);
+  
+    if (userDocSnap.exists()) {
+      // User exists, update the handles array
+      await updateDoc(userDocRef, {
+        handles: arrayUnion(newHandle)
+      });
     } else {
-      alert("Maximum of 10 handles allowed");
+      // User does not exist, create the document with initial fields
+      await setDoc(userDocRef, {
+        handles: [newHandle],
+        // Add other necessary fields with default or empty values
+        name: auth.currentUser.displayName || 'Anonymous',
+        email: auth.currentUser.email || '',
+        // Add any other fields you deem necessary for a new user
+      });
     }
+  
+    // Update local handles state
+    setHandles(prevHandles => [...prevHandles, newHandle]);
+  
+    alert('Handle added successfully');
+    setNewHandle(''); // Clear the input field after adding
   };
+  
 
   const [totalProblemsSolved, setTotalProblemsSolved] = useState(0);
 

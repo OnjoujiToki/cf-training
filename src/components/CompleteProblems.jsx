@@ -23,19 +23,6 @@ function CompleteProblems() {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "OK") {
-          /*const problemsCollection = collection(db, 'problems');
-          //I FORGOT to CHECK here
-          data.result.problems.forEach(async (problem) => {
-            const problemId = `${problem.contestId}${problem.index}`;
-            const problemDoc = doc(problemsCollection, problemId);
-            const problemData = {
-              id: problemId,
-              name: problem.name,
-              rating: problem.rating,
-              tags: problem.tags,
-            };
-            await setDoc(problemDoc, problemData);
-          });*/
           setProblems(data.result.problems);
           setIsLoaded(true);
         }

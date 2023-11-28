@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc} from "firebase/firestore";
 import { db } from "../../config/firebase";
 import ProblemList from "../ProblemList";
 
@@ -8,7 +8,16 @@ function PlanDetail() {
   const { planId } = useParams();
   const [plan, setPlan] = useState(null);
   const [problemDetails, setProblemDetails] = useState([]);
-
+  const handleProblemDelete = async (problemId) => {
+    try {
+      const updatedProblems = plan.problems.filter(pId => pId !== problemId);
+      await updateDoc(doc(db, "plans", planId), { problems: updatedProblems });
+      setPlan({ ...plan, problems: updatedProblems });
+      setProblemDetails(problemDetails.filter(p => p.id !== problemId));
+    } catch (error) {
+      console.error("Error deleting problem:", error);
+    }
+  };
   useEffect(() => {
     const fetchPlan = async () => {
       // Fetch the plan
@@ -31,8 +40,7 @@ function PlanDetail() {
 
           if (problemSnap.exists()) {
             // Problem found in the database
-            console.log("Problem found in the database");
-            console.log(problemSnap.data());
+          
             return problemSnap.data();
           } else {
             console.log("ERROR getting the problem rom the database")
@@ -51,7 +59,7 @@ function PlanDetail() {
   return (
     <div className="plan-detail-container">
     
-      <ProblemList problems={problemDetails} showTags={true} listName={plan.name} />
+      <ProblemList problems={problemDetails} showTags={true} listName={plan.name} onDelete={handleProblemDelete}/>
     </div>
   );
 }

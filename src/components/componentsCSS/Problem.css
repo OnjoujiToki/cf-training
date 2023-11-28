@@ -1,0 +1,17 @@
+.problem-container {
+    position: relative;
+  }
+  
+  .delete-icon {
+    position: absolute;
+    bottom: 10px; /* Position at the bottom */
+    right: 10px; /* Position to the right */
+    cursor: pointer;
+    color: gray; /* Change to your preferred color */
+    z-index: 2;
+  }
+  
+  /* ... other styles ... */
+  .problem-link {
+    display: block; /* Ensure this takes up the full space for proper layout */
+  }
