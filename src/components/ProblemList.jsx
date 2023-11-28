@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import Problem from "./Problem";
 
-function ProblemList({ problems, showTags, listName}) {
+function ProblemList({ problems, showTags, listName, onDelete}) {
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 50;
 
@@ -38,6 +38,7 @@ function ProblemList({ problems, showTags, listName}) {
               problem={problem}
               isSolved={false /* logic to determine if solved */}
               showTags={showTags}
+              onDelete={onDelete}
             />
           </CSSTransition>
         ))}

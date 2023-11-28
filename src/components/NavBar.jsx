@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, NavbarBrand, Nav, NavItem, NavLink, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { signOut } from 'firebase/auth';
-import { auth } from '../config/firebase';
-
+import { auth, db } from '../config/firebase'; // Adjust import path as needed
+import { doc, getDoc } from 'firebase/firestore';
 function NavBar({ isLoggedIn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState('User');
+
+ 
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUserName(docSnap.data().name || 'No name'); // Replace 'name' with the field name in your database
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [isLoggedIn]);
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
@@ -34,12 +50,15 @@ function NavBar({ isLoggedIn }) {
         <NavItem>
           <NavLink to="/training" tag={Link}>Training</NavLink>
         </NavItem>
+        <NavItem>
+          <NavLink to="/favorite" tag={Link}>❤️Favorite</NavLink>
+        </NavItem>
       </Nav>
       <Nav navbar>
         {isLoggedIn ? (
           <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
             <DropdownToggle caret>
-              {auth.currentUser.displayName || 'Nickname'}
+              {userName|| 'Nickname'}
             </DropdownToggle>
             <DropdownMenu end>
               <DropdownItem tag={Link} to="/settings">Settings</DropdownItem>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ListGroup, ListGroupItem, Card, CardHeader, CardBody, Container, Row, Col, Button} from 'reactstrap';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom';
-import {auth} from '../config/firebase';
+import {auth} from '../../config/firebase';
 
 function Training() {
   const [publicPlans, setPublicPlans] = useState([]);
