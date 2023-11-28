@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc} from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db, auth} from "../../config/firebase";
 import ProblemList from "../ProblemList";
 
 function PlanDetail() {
@@ -56,10 +56,13 @@ function PlanDetail() {
 
   if (!plan) return <div>Loading...</div>;
   
+  const isAuthor = auth.currentUser && plan.author_id === auth.currentUser.uid;
+
   return (
     <div className="plan-detail-container">
     
-      <ProblemList problems={problemDetails} showTags={true} listName={plan.name} onDelete={handleProblemDelete}/>
+      <ProblemList problems={problemDetails} showTags={true} listName={plan.name}   onDelete={isAuthor ? handleProblemDelete : undefined} // Pass onDelete only if the user is the author
+      />
     </div>
   );
 }
