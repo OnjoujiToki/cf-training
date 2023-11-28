@@ -1,5 +1,5 @@
 ## To do
--[] Finish User Save Function to print user self-define plans 
--[] Optimize UI for RecentSolvedProblem.jsx
--[] Add Setting Page to Show Tag or not
--[] Training Plans Pagination
+1. Finish User Save Function to print user self-define plans 
+2. Optimize UI for RecentSolvedProblem.jsx
+3. Add Setting Page to Show Tag or not
+4. Training Plans Pagination
