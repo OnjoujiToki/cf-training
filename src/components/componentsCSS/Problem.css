@@ -1,17 +1,25 @@
 .problem-container {
-    position: relative;
-  }
-  
-  .delete-icon {
-    position: absolute;
-    bottom: 10px; /* Position at the bottom */
-    right: 10px; /* Position to the right */
-    cursor: pointer;
-    color: gray; /* Change to your preferred color */
-    z-index: 2;
-  }
-  
-  /* ... other styles ... */
-  .problem-link {
-    display: block; /* Ensure this takes up the full space for proper layout */
-  }
+  position: relative;
+}
+.problem-container:hover,
+.problem:hover {
+  background-color: gainsboro; /* Replace with the color you want */
+  /* Add any other styles you want on hover */
+}
+.delete-icon {
+  position: absolute;
+  bottom: 10px; /* Position at the bottom */
+  right: 10px; /* Position to the right */
+  cursor: pointer;
+  color: gray; /* Change to your preferred color */
+  z-index: 2;
+}
+
+/* ... other styles ... */
+.problem-link {
+  display: block; /* Ensure this takes up the full space for proper layout */
+}
+
+.problem.solved {
+  background-color: gainsboro; /* Your deeper color for solved problems */
+}

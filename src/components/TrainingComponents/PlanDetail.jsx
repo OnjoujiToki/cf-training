@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc} from "firebase/firestore";
 import { db, auth} from "../../config/firebase";
 import ProblemList from "../ProblemList";
-
+import "../componentsCSS/PlanDetailCSS.css"
 function PlanDetail() {
   const { planId } = useParams();
   const [plan, setPlan] = useState(null);
@@ -18,6 +18,27 @@ function PlanDetail() {
       console.error("Error deleting problem:", error);
     }
   };
+
+
+  const handleAddProblem = async () => {
+    const problemKey = prompt("Enter the problem key:");
+    if (problemKey) {
+      const problemRef = doc(db, "problems", problemKey);
+      const problemSnap = await getDoc(problemRef);
+
+      if (problemSnap.exists()) {
+        const newProblem = problemSnap.data();
+        const updatedProblems = [...plan.problems, problemKey]; // Add new problem key to array
+        await updateDoc(doc(db, "plans", planId), { problems: updatedProblems });
+
+        setPlan({ ...plan, problems: updatedProblems });
+        setProblemDetails([...problemDetails, newProblem]); // Add new problem data to state
+      } else {
+        console.log("Problem not found");
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchPlan = async () => {
       // Fetch the plan
@@ -47,7 +68,7 @@ function PlanDetail() {
            }
         })
       );
-
+      console.log("fetchedProblems", fetchedProblems);
       setProblemDetails(fetchedProblems);
     };
 
@@ -60,8 +81,21 @@ function PlanDetail() {
 
   return (
     <div className="plan-detail-container">
-    
-      <ProblemList problems={problemDetails} showTags={true} listName={plan.name}   onDelete={isAuthor ? handleProblemDelete : undefined} // Pass onDelete only if the user is the author
+      <div className="plan-header">
+        {isAuthor && (
+          <div className="add-problem-container">
+            <button onClick={handleAddProblem} className="add-problem-button">
+              Add New Problem
+            </button>
+          </div>
+        )}
+      </div>
+      <ProblemList
+        plan={planId}
+        listName={plan.name}
+        problems={problemDetails} 
+        showTags={true} 
+        onDelete={isAuthor ? handleProblemDelete : undefined} 
       />
     </div>
   );

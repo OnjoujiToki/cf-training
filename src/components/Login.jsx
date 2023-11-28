@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import '../styles/Login.css'; // Import the Login.css file
 import { auth, db } from '../config/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 function Login({ onRegisterClick }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission
 
     try {
       // Attempt to sign in the user
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       console.log('User logged in:', userCredential.user);
       // Redirect or perform further actions after successful login
     } catch (error) {
@@ -36,31 +44,34 @@ function Login({ onRegisterClick }) {
       // Handle errors here
     }
   };
-  
 
   return (
-    <form onSubmit={handleSubmit} className='login-form'>
+    <form onSubmit={handleSubmit} className="login-form">
       <h2>Login</h2>
-      <input 
-        type="email" 
-        value={email} 
-        onChange={(e) => setEmail(e.target.value)} 
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="Username"
-        required 
+        required
       />
-      <input 
-        type="password" 
-        value={password} 
-        onChange={(e) => setPassword(e.target.value)} 
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
-        required 
+        required
       />
       <button type="submit">Login</button>
-      <button type="button" onClick={onRegisterClick}>Register</button>
-      <button type="button" onClick={handleGoogleLogin} className="google-login-btn">
-  Log in with Google
-</button>
-
+      <button type="button" onClick={onRegisterClick}>
+        Register
+      </button>
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="google-login-btn">
+        Log in with Google
+      </button>
     </form>
   );
 }

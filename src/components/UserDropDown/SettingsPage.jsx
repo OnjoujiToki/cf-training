@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, FormGroup, Label, Input, Card, CardBody, CardHeader, Alert } from 'reactstrap';
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Card,
+  CardBody,
+  CardHeader,
+  Alert,
+} from 'reactstrap';
 import { db, auth } from '../../config/firebase'; // Adjust import path as needed
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -11,7 +21,7 @@ function SettingsPage() {
 
   useEffect(() => {
     if (auth.currentUser) {
-      const userDocRef = doc(db, "users", auth.currentUser.uid);
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
       getDoc(userDocRef).then((docSnap) => {
         if (docSnap.exists()) {
           const userData = docSnap.data();
@@ -38,10 +48,10 @@ function SettingsPage() {
       return;
     }
 
-    const userDocRef = doc(db, "users", auth.currentUser.uid);
+    const userDocRef = doc(db, 'users', auth.currentUser.uid);
     await updateDoc(userDocRef, {
       showTags: showTags,
-      name: nickname
+      name: nickname,
     });
 
     alert('Settings updated successfully!');
@@ -51,24 +61,43 @@ function SettingsPage() {
     return <div>Loading...</div>;
   }
 
-
   return (
     <div>
       <Card>
-        <CardHeader><h2>Settings</h2></CardHeader>
+        <CardHeader>
+          <h2>Settings</h2>
+        </CardHeader>
         <CardBody>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
               <Label>Show Problem Tags</Label>
-              <Input type="switch" id="showTagsSwitch" name="showTags" checked={showTags} onChange={handleShowTagsChange} />
+              <Input
+                type="switch"
+                id="showTagsSwitch"
+                name="showTags"
+                checked={showTags}
+                onChange={handleShowTagsChange}
+              />
             </FormGroup>
             <FormGroup>
               <Label for="nickname">Nickname</Label>
-              <Input type="text" name="nickname" id="nickname" value={nickname} onChange={handleNicknameChange} />
+              <Input
+                type="text"
+                name="nickname"
+                id="nickname"
+                value={nickname}
+                onChange={handleNicknameChange}
+              />
             </FormGroup>
-            <Button type="submit" color="primary">Save Changes</Button>
+            <Button type="submit" color="primary">
+              Save Changes
+            </Button>
           </Form>
-          {saveStatus && <Alert color="success" className="mt-3">{saveStatus}</Alert>}
+          {saveStatus && (
+            <Alert color="success" className="mt-3">
+              {saveStatus}
+            </Alert>
+          )}
         </CardBody>
       </Card>
     </div>

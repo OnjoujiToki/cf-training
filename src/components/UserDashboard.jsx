@@ -1,30 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Input, ListGroup, ListGroupItem } from 'reactstrap';
-import RecentSolvedProblems from "./DashboardComponents/RecentSolvedProblems";
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Input,
+  ListGroup,
+  ListGroupItem,
+} from 'reactstrap';
+import RecentSolvedProblems from './DashboardComponents/RecentSolvedProblems';
 import SolveCount from './DashboardComponents/SolveCount';
-import HandleManager from "./DashboardComponents/HandleManager";
+import HandleManager from './DashboardComponents/HandleManager';
 import { auth, db } from '../config/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 function UserDashboard() {
   const [handles, setHandles] = useState([]);
-  const [newHandle, setNewHandle] = useState("");
+  const [newHandle, setNewHandle] = useState('');
   const [recentProblems, setRecentProblems] = useState([]);
-  
+
   const fetchRecentSolvedProblems = async (handles) => {
     try {
-      const allPromises = handles.map((handle) => fetchTenProblemsForHandle(handle));
+      const allPromises = handles.map((handle) =>
+        fetchTenProblemsForHandle(handle)
+      );
       const allResults = await Promise.all(allPromises);
 
       let recentSolvedProblems = [];
       allResults.forEach((userSubmissions) => {
         userSubmissions.forEach((submission) => {
-          if (submission.verdict === "OK") {
+          if (submission.verdict === 'OK') {
             recentSolvedProblems.push({
               problemId: `${submission.problem.contestId}${submission.problem.index}`,
               name: submission.problem.name,
               solvedAt: submission.creationTimeSeconds,
-              handle: submission.author.members[0].handle
+              handle: submission.author.members[0].handle,
             });
           }
         });
@@ -33,7 +47,7 @@ function UserDashboard() {
       recentSolvedProblems.sort((a, b) => b.solvedAt - a.solvedAt);
       return recentSolvedProblems.slice(0, 10);
     } catch (error) {
-      console.error("Error fetching recent solved problems:", error);
+      console.error('Error fetching recent solved problems:', error);
       return [];
     }
   };
@@ -51,34 +65,34 @@ function UserDashboard() {
     const recentSolved = await fetchRecentSolvedProblems(handles);
     setRecentProblems(recentSolved);
   };
-  
+
   const fetchProblemsForHandle = async (handle) => {
     try {
       const response = await fetch(
-        `https://codeforces.com/api/user.status?handle=${handle}`,
+        `https://codeforces.com/api/user.status?handle=${handle}`
       );
       const data = await response.json();
-      if (data.status !== "OK") {
-        throw new Error("Failed to fetch data");
+      if (data.status !== 'OK') {
+        throw new Error('Failed to fetch data');
       }
       return data.result;
     } catch (error) {
-      console.error("Error fetching problems for handle:", handle, error);
+      console.error('Error fetching problems for handle:', handle, error);
       return [];
     }
   };
   const fetchTenProblemsForHandle = async (handle) => {
     try {
       const response = await fetch(
-        `https://codeforces.com/api/user.status?handle=${handle}&from=1&count=10`,
+        `https://codeforces.com/api/user.status?handle=${handle}&from=1&count=10`
       );
       const data = await response.json();
-      if (data.status !== "OK") {
-        throw new Error("Failed to fetch data");
+      if (data.status !== 'OK') {
+        throw new Error('Failed to fetch data');
       }
       return data.result;
     } catch (error) {
-      console.error("Error fetching problems for handle:", handle, error);
+      console.error('Error fetching problems for handle:', handle, error);
       return [];
     }
   };
@@ -86,14 +100,14 @@ function UserDashboard() {
   const aggregateProblemsForAllHandles = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
-        fetchProblemsForHandle(handle),
+        fetchProblemsForHandle(handle)
       );
       const allResults = await Promise.all(allPromises);
 
       const solvedProblems = new Set();
       allResults.forEach((userSubmissions) => {
         userSubmissions.forEach((submission) => {
-          if (submission.verdict === "OK") {
+          if (submission.verdict === 'OK') {
             const problemId = `${submission.problem.contestId}${submission.problem.index}`;
             solvedProblems.add(problemId);
           }
@@ -102,7 +116,7 @@ function UserDashboard() {
 
       return solvedProblems.size;
     } catch (error) {
-      console.error("Error aggregating problems:", error);
+      console.error('Error aggregating problems:', error);
       return 0;
     }
   };
@@ -110,14 +124,14 @@ function UserDashboard() {
   const aggregateTenProblemsForAllHandles = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
-        fetchTenProblemsForHandle(handle),
+        fetchTenProblemsForHandle(handle)
       );
       const allResults = await Promise.all(allPromises);
 
       const solvedProblems = new Set();
       allResults.forEach((userSubmissions) => {
         userSubmissions.forEach((submission) => {
-          if (submission.verdict === "OK") {
+          if (submission.verdict === 'OK') {
             const problemId = `${submission.problem.contestId}${submission.problem.index}`;
             solvedProblems.add(problemId);
           }
@@ -126,7 +140,7 @@ function UserDashboard() {
 
       return solvedProblems.size;
     } catch (error) {
-      console.error("Error aggregating problems:", error);
+      console.error('Error aggregating problems:', error);
       return 0;
     }
   };
@@ -134,7 +148,7 @@ function UserDashboard() {
   useEffect(() => {
     const fetchUserHandles = async () => {
       if (auth.currentUser) {
-        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
           setHandles(userDocSnap.data().handles || []);
@@ -145,16 +159,15 @@ function UserDashboard() {
     fetchUserHandles();
   }, []);
 
-
   const isHandleValid = async (handle) => {
     try {
       const response = await fetch(
-        `https://codeforces.com/api/user.info?handles=${handle}`,
+        `https://codeforces.com/api/user.info?handles=${handle}`
       );
       const data = await response.json();
-      return data.status === "OK";
+      return data.status === 'OK';
     } catch (error) {
-      console.error("Error fetching data from Codeforces:", error);
+      console.error('Error fetching data from Codeforces:', error);
       return false; // If an error occurs, assume the handle is not valid
     }
   };
@@ -169,13 +182,13 @@ function UserDashboard() {
       return;
     }
     console.log('Adding handle:', newHandle);
-    const userDocRef = doc(db, "users", auth.currentUser.uid);
+    const userDocRef = doc(db, 'users', auth.currentUser.uid);
     const userDocSnap = await getDoc(userDocRef);
-  
+
     if (userDocSnap.exists()) {
       // User exists, update the handles array
       await updateDoc(userDocRef, {
-        handles: arrayUnion(newHandle)
+        handles: arrayUnion(newHandle),
       });
     } else {
       // User does not exist, create the document with initial fields
@@ -187,14 +200,13 @@ function UserDashboard() {
         // Add any other fields you deem necessary for a new user
       });
     }
-  
+
     // Update local handles state
-    setHandles(prevHandles => [...prevHandles, newHandle]);
-  
+    setHandles((prevHandles) => [...prevHandles, newHandle]);
+
     alert('Handle added successfully');
     setNewHandle(''); // Clear the input field after adding
   };
-  
 
   const [totalProblemsSolved, setTotalProblemsSolved] = useState(0);
 
@@ -203,17 +215,23 @@ function UserDashboard() {
     setTotalProblemsSolved(count);
   };
 
-  
-
   return (
     <Container fluid>
       <h2 className="my-4">User Dashboard</h2>
       <Row>
         <Col md={6}>
-          <HandleManager handles={handles} newHandle={newHandle} setNewHandle={setNewHandle} addHandle={addHandle}/>
+          <HandleManager
+            handles={handles}
+            newHandle={newHandle}
+            setNewHandle={setNewHandle}
+            addHandle={addHandle}
+          />
         </Col>
         <Col md={6}>
-          <SolveCount totalProblemsSolved={totalProblemsSolved} updateProblemCount={updateTotalProblemsSolved} />
+          <SolveCount
+            totalProblemsSolved={totalProblemsSolved}
+            updateProblemCount={updateTotalProblemsSolved}
+          />
         </Col>
       </Row>
       <Row>

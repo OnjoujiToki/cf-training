@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from "react";
-import ProblemList from "./ProblemList";
-import Pagination from "./Pagination";
-import { collection, doc, setDoc,query, where, getDocs } from 'firebase/firestore';
-import { db } from "../config/firebase";
+import React, { useState, useEffect } from 'react';
+import ProblemList from './ProblemList';
+import Pagination from './Pagination';
+import {
+  collection,
+  doc,
+  setDoc,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+import { db } from '../config/firebase';
 // import './App.css';
 
 const ALL_PROBLEMS_URL =
-  "https://codeforces.com/api/problemset.problems?lang=en";
+  'https://codeforces.com/api/problemset.problems?lang=en';
 
 function CompleteProblems() {
-  const [userHandle, setUserHandle] = useState("");
+  const [userHandle, setUserHandle] = useState('');
   const [problems, setProblems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [problemsPerPage, setProblemsPerPage] = useState(50);
@@ -22,12 +29,11 @@ function CompleteProblems() {
     fetch(ALL_PROBLEMS_URL)
       .then((response) => response.json())
       .then((data) => {
-        if (data.status === "OK") {
+        if (data.status === 'OK') {
           setProblems(data.result.problems);
           setIsLoaded(true);
         }
       });
-  
   }, [userHandle]);
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
@@ -41,11 +47,16 @@ function CompleteProblems() {
   );
   return (
     <div className="Home">
-     
       <button onClick={toggleTagsVisibility}>
         {showTags ? 'Hide All Tags' : 'Show All Tags'}
       </button>
-      {isLoaded && <ProblemList problems={currentProblems} showTags={showTags} listName={"Codeforces Problem"}/>}
+      {isLoaded && (
+        <ProblemList
+          problems={currentProblems}
+          showTags={showTags}
+          listName={'Codeforces Problem'}
+        />
+      )}
       {isLoaded && (
         <Pagination
           currentPage={currentPage}
@@ -58,8 +69,7 @@ function CompleteProblems() {
         />
       )}
     </div>
-  )
- 
+  );
 }
 
 export default CompleteProblems;

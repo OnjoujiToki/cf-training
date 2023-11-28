@@ -1,0 +1,31 @@
+.plan-detail-container {
+  position: relative; /* Keep this to establish a positioning context */
+  padding-top: 2em;
+}
+
+.add-problem-container {
+  position: absolute;
+  top: 0; /* Align to the top */
+  right: 0; /* Align to the right */
+  padding: 1em;
+}
+
+.add-problem-button {
+  padding: 0.75em 0.75em;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.add-problem-button:hover {
+  background-color: #218838;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust the styling for ProblemList if necessary */

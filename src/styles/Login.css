@@ -1,39 +1,37 @@
 .login-form {
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: auto; /* Adjust this to change the height of the card */
-    gap: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    padding: 20px;
-    width: 300px;
-    margin: 60px auto 60px; /* Add top and bottom margin */
-  }
-  .login-form input {
-    
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .login-form button {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto; /* Adjust this to change the height of the card */
+  gap: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  width: 300px;
+  margin: 60px auto 60px; /* Add top and bottom margin */
+}
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
 
-  /* ... existing styles ... */
+.login-form button {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* ... existing styles ... */
 
 .google-login-btn {
   background-color: #db4437; /* Google's red color */

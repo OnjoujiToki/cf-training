@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 function Pagination({
   currentPage,
@@ -23,16 +23,16 @@ function Pagination({
   return (
     <div className="pagination-container">
       <button onClick={goToFirstPage} disabled={currentPage === 1}>
-        {"<<"}
+        {'<<'}
       </button>
       <button onClick={goToPreviousPage} disabled={currentPage === 1}>
-        {"<"}
+        {'<'}
       </button>
       <button onClick={goToNextPage} disabled={currentPage === totalPages}>
-        {">"}
+        {'>'}
       </button>
       <button onClick={goToLastPage} disabled={currentPage === totalPages}>
-        {">>"}
+        {'>>'}
       </button>
       <span>
         Page {currentPage} of {totalPages}
