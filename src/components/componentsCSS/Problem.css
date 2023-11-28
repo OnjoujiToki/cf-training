@@ -15,3 +15,8 @@
   .problem-link {
     display: block; /* Ensure this takes up the full space for proper layout */
   }
+
+  .problem-container:hover, .problem:hover {
+    background-color: gainsboro; /* Replace with the color you want */
+    /* Add any other styles you want on hover */
+  }
