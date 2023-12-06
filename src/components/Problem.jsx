@@ -61,6 +61,7 @@ const Problem = ({ problem, isSolved, showTags, onDelete, planId }) => {
     }
 
     const userDocRef = doc(db, 'users', auth.currentUser.uid);
+    const problemRef = doc(db, 'problems', problemIdentifier);
 
     if (isFavorite) {
       // Remove from favorites
@@ -68,6 +69,21 @@ const Problem = ({ problem, isSolved, showTags, onDelete, planId }) => {
         fav: arrayRemove(problemIdentifier),
       });
     } else {
+      // Check if the problem exists in the database
+      const problemSnap = await getDoc(problemRef);
+      if (!problemSnap.exists()) {
+        // If the problem is not in the database, add it
+
+        await setDoc(problemRef, {
+          id: problemIdentifier,
+          name: problem.name,
+          rating: problem.rating,
+          tags: problem.tags,
+          // contestId: problem.contestId,
+          // index: problem.index,
+        });
+      }
+
       // Add to favorites
       await updateDoc(userDocRef, {
         fav: arrayUnion(problemIdentifier),
