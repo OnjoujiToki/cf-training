@@ -12,6 +12,9 @@ import RecentSolvedProblems from './RecentSolvedProblems';
 import SolveCount from './SolveCount';
 import HandleManager from './HandleManager';
 import { auth, db } from '../../config/firebase';
+import CalendarHeatmap from 'react-calendar-heatmap';
+
+import '../componentsCSS/HeatMapCSS.css';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
@@ -25,6 +28,66 @@ function UserDashboard() {
   const [newHandle, setNewHandle] = useState('');
   const [recentProblems, setRecentProblems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [submissionData, setSubmissionData] = useState([]);
+
+  useEffect(() => {
+    // Fetch and process data when component mounts
+    const fetchAndProcessData = async () => {
+      let allSubmissions = [];
+      for (const handle of handles) {
+        const submissions = await fetchAllSubmissionsForHandle(handle);
+        allSubmissions.push(...submissions);
+      }
+      processSubmissions(allSubmissions);
+    };
+
+    if (handles.length > 0) {
+      fetchAndProcessData();
+    }
+  }, [handles]);
+  const fetchAllSubmissionsForHandle = async (handle) => {
+    try {
+      // Calculate the date 13 months ago
+      const date13MonthsAgo = new Date();
+      date13MonthsAgo.setMonth(date13MonthsAgo.getMonth() - 12);
+
+      // Convert the date to UNIX timestamp (in seconds)
+      const fromTime = Math.floor(date13MonthsAgo.getTime() / 1000);
+
+      // Fetch submissions from the Codeforces API
+      const response = await fetch(
+        `https://codeforces.com/api/user.status?handle=${handle}&from=1&startTime=${fromTime}`
+      );
+      // console.log(response);
+      const data = await response.json();
+
+      // Check if the response is OK
+      if (data.status !== 'OK') {
+        throw new Error('Failed to fetch data');
+      }
+
+      // Return the submissions
+      return data.result;
+    } catch (error) {
+      console.error('Error fetching submissions for handle:', handle, error);
+      return [];
+    }
+  };
+
+  const processSubmissions = (submissions) => {
+    // Process submissions to count per day
+    const countsPerDay = {};
+    submissions.forEach((submission) => {
+      const date = new Date(submission.creationTimeSeconds * 1000)
+        .toISOString()
+        .split('T')[0];
+      countsPerDay[date] = (countsPerDay[date] || 0) + 1;
+    });
+    setSubmissionData(
+      Object.entries(countsPerDay).map(([date, count]) => ({ date, count }))
+    );
+  };
+
   const fetchProblemDetails = async (problemId) => {
     const problemRef = doc(db, 'problems', problemId);
     try {
@@ -116,6 +179,14 @@ function UserDashboard() {
     }
   };
 
+  const getColorIntensity = (count) => {
+    // This function should return a color based on the count.
+    // You can adjust the thresholds and colors as needed.
+    if (count >= 10) return 'darkgreen';
+    if (count >= 5) return 'green';
+    if (count >= 1) return 'lightgreen';
+    return 'white'; // No submissions
+  };
   const aggregateProblemsForAllHandles = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
@@ -219,7 +290,7 @@ function UserDashboard() {
       alert('No user logged in');
       return;
     }
-    console.log('Adding handle:', newHandle);
+    // console.log('Adding handle:', newHandle);
     const userDocRef = doc(db, 'users', auth.currentUser.uid);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -295,6 +366,7 @@ function UserDashboard() {
       <h2 className="my-4">User Dashboard</h2>
       <Row>
         <Col md={6}>
+          {' '}
           <HandleManager
             handles={handles}
             newHandle={newHandle}
@@ -322,6 +394,39 @@ function UserDashboard() {
             </CardHeader>
             <CardBody>
               <RecentSolvedProblems recentProblems={recentProblems} />
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col md={8}>
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle tag="h5">Submission Heatmap</CardTitle>
+            </CardHeader>
+            <CardBody>
+              <CalendarHeatmap
+                startDate={
+                  new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+                }
+                endDate={new Date()}
+                values={submissionData}
+                classForValue={(value) => {
+                  if (!value || value.count === 0) {
+                    return 'color-github-0';
+                  }
+                  if (value.count >= 1 && value.count < 3) {
+                    return 'color-github-1';
+                  }
+                  if (value.count >= 3 && value.count < 5) {
+                    return 'color-github-2';
+                  }
+                  if (value.count >= 5 && value.count < 10) {
+                    return 'color-github-3';
+                  }
+                  return 'color-github-4'; // For 10 or more submissions
+                }}
+              />
             </CardBody>
           </Card>
         </Col>
