@@ -1,18 +1,22 @@
 import React from 'react';
-import { ListGroup, ListGroupItem } from 'reactstrap';
+import Problem from '../Problem'; // Import the Problem component
 
 function RecentSolvedProblems({ recentProblems }) {
   return (
     <div>
-      <h3>Recent Solved Problems</h3>
-      <ListGroup>
-        {recentProblems.map((problem, index) => (
-          <ListGroupItem key={index} className="d-flex justify-content-between align-items-center">
-            <span className="problem-name">{problem.name} (ID: {problem.problemId})</span>
-            <span className="badge badge-primary badge-pill">{problem.handle}</span>
-          </ListGroupItem>
-        ))}
-      </ListGroup>
+      {recentProblems.map((problem, index) => (
+        <Problem
+          key={index}
+          problem={{
+            id: problem.problemId,
+            name: problem.name,
+            rating: problem.rating,
+            tags: problem.tags,
+          }}
+          isSolved={false}
+          showTags={true}
+        />
+      ))}
     </div>
   );
 }

@@ -3,10 +3,10 @@ import {
   Container,
   Row,
   Col,
-  Button,
-  Input,
-  ListGroup,
-  ListGroupItem,
+  Card,
+  CardHeader,
+  CardBody,
+  CardTitle,
 } from 'reactstrap';
 import RecentSolvedProblems from './DashboardComponents/RecentSolvedProblems';
 import SolveCount from './DashboardComponents/SolveCount';
@@ -23,6 +23,17 @@ function UserDashboard() {
   const [newHandle, setNewHandle] = useState('');
   const [recentProblems, setRecentProblems] = useState([]);
 
+  const fetchProblemDetails = async (problemId) => {
+    const problemRef = doc(db, 'problems', problemId);
+    try {
+      const problemSnap = await getDoc(problemRef);
+      return problemSnap.exists() ? problemSnap.data() : null;
+    } catch (error) {
+      console.error('Error fetching problem details:', error);
+      return null;
+    }
+  };
+
   const fetchRecentSolvedProblems = async (handles) => {
     try {
       const allPromises = handles.map((handle) =>
@@ -31,18 +42,24 @@ function UserDashboard() {
       const allResults = await Promise.all(allPromises);
 
       let recentSolvedProblems = [];
-      allResults.forEach((userSubmissions) => {
-        userSubmissions.forEach((submission) => {
+      for (const userSubmissions of allResults) {
+        for (const submission of userSubmissions) {
           if (submission.verdict === 'OK') {
-            recentSolvedProblems.push({
-              problemId: `${submission.problem.contestId}${submission.problem.index}`,
-              name: submission.problem.name,
-              solvedAt: submission.creationTimeSeconds,
-              handle: submission.author.members[0].handle,
-            });
+            const problemId = `${submission.problem.contestId}${submission.problem.index}`;
+            const problemDetails = await fetchProblemDetails(problemId);
+            if (problemDetails) {
+              recentSolvedProblems.push({
+                problemId,
+                name: submission.problem.name,
+                rating: problemDetails.rating,
+                tags: problemDetails.tags,
+                solvedAt: submission.creationTimeSeconds,
+                handle: submission.author.members[0].handle,
+              });
+            }
           }
-        });
-      });
+        }
+      }
 
       recentSolvedProblems.sort((a, b) => b.solvedAt - a.solvedAt);
       return recentSolvedProblems.slice(0, 10);
@@ -234,9 +251,20 @@ function UserDashboard() {
           />
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <RecentSolvedProblems recentProblems={recentProblems} />
+      <Row className="justify-content-md-center">
+        {' '}
+        {/* Centering the row */}
+        <Col md={8}>
+          {' '}
+          {/* Adjusted column size for a more centered look */}
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle tag="h5">Recent Solved Problems</CardTitle>
+            </CardHeader>
+            <CardBody>
+              <RecentSolvedProblems recentProblems={recentProblems} />
+            </CardBody>
+          </Card>
         </Col>
       </Row>
     </Container>
