@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../config/firebase'; // Adjust import path as needed
 import { doc, getDoc } from 'firebase/firestore';
 import ProblemList from '../ProblemList';
-
+import LoadingComponents from '../misc/LoadingComponents';
 function FavoriteProblems() {
   const [favoriteProblems, setFavoriteProblems] = useState([]);
   const [showTags] = useState(true); // Assuming you always want to show tags
+  const [isLoading, setIsLoading] = useState(true); // New loading state
 
   useEffect(() => {
     let isSubscribed = true;
-
+    setIsLoading(true); // Start loading
     const fetchFavoriteProblems = async () => {
       if (auth.currentUser && isSubscribed) {
         const userDocRef = doc(db, 'users', auth.currentUser.uid);
@@ -56,9 +57,12 @@ function FavoriteProblems() {
         });
       }
     }
-
+    setIsLoading(false);
     return problems;
   };
+  if (isLoading) {
+    return <LoadingComponents />;
+  }
   return (
     <div>
       <ProblemList

@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 // import './App.css';
+import LoadingComponent from './misc/LoadingComponents';
 
 const ALL_PROBLEMS_URL =
   'https://codeforces.com/api/problemset.problems?lang=en';
@@ -26,6 +27,7 @@ function CompleteProblems() {
     setShowTags(!showTags);
   };
   useEffect(() => {
+    setIsLoaded(false);
     fetch(ALL_PROBLEMS_URL)
       .then((response) => response.json())
       .then((data) => {
@@ -34,6 +36,7 @@ function CompleteProblems() {
           setIsLoaded(true);
         }
       });
+    setIsLoaded(true);
   }, [userHandle]);
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
@@ -45,6 +48,9 @@ function CompleteProblems() {
     indexOfFirstProblem,
     indexOfLastProblem
   );
+  if (!isLoaded) {
+    return <LoadingComponent />;
+  }
   return (
     <div className="Home">
       <button onClick={toggleTagsVisibility}>
