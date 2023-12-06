@@ -20,7 +20,7 @@ function CompleteProblems() {
   const [userHandle, setUserHandle] = useState('');
   const [problems, setProblems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [problemsPerPage, setProblemsPerPage] = useState(50);
+  const [problemsPerPage, setProblemsPerPage] = useState(10);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showTags, setShowTags] = useState(true);
   const toggleTagsVisibility = () => {

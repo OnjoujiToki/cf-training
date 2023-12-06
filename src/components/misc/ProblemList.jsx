@@ -21,7 +21,7 @@ function ProblemList({ problems, showTags, listName, onDelete, planId }) {
   const indexOfLastProblem = currentPage * problemsPerPage;
   const indexOfFirstProblem = indexOfLastProblem - problemsPerPage;
   const [localProblems, setLocalProblems] = useState(problems); // Local state to manage problems
-
+  const [isLoading, setIsLoading] = useState(true); // New loading state
   const currentProblems = problems.slice(
     indexOfFirstProblem,
     indexOfLastProblem
@@ -113,6 +113,7 @@ function ProblemList({ problems, showTags, listName, onDelete, planId }) {
 
   useEffect(() => {
     setLocalProblems(problems); // Update local state when problems prop changes
+    // console.log(problems);
   }, [problems]);
   // Change page
 
