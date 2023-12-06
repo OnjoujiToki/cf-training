@@ -250,13 +250,14 @@ function UserDashboard() {
               setTotalProblemsSolved(userData.solveCount);
             } else {
               // If solveCount is not present, calculate it, update the database, and set it in the state
-              const count = await aggregateProblemsForAllHandles(
+              /*const count = await aggregateProblemsForAllHandles(
                 userData.handles || []
               );
               setTotalProblemsSolved(count);
               await updateDoc(userDocRef, {
                 solveCount: count,
-              });
+              });*/
+              setTotalProblemsSolved(0);
             }
           }
         } catch (error) {
