@@ -8,6 +8,7 @@ function PlanDetail() {
   const { planId } = useParams();
   const [plan, setPlan] = useState(null);
   const [problemDetails, setProblemDetails] = useState([]);
+  const [showTags, setShowTags] = useState(true); // Default
   const handleProblemDelete = async (problemId) => {
     try {
       const updatedProblems = plan.problems.filter((pId) => pId !== problemId);
@@ -71,7 +72,16 @@ function PlanDetail() {
       console.log('fetchedProblems', fetchedProblems);
       setProblemDetails(fetchedProblems);
     };
-
+    const fetchUserPreference = async () => {
+      if (auth.currentUser) {
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists() && userDocSnap.data().showTags !== undefined) {
+          setShowTags(userDocSnap.data().showTags);
+        }
+      }
+    };
+    fetchUserPreference();
     fetchPlan();
   }, [planId]);
 
@@ -94,7 +104,7 @@ function PlanDetail() {
         plan={planId}
         listName={plan.name}
         problems={problemDetails}
-        showTags={true}
+        showTags={showTags}
         onDelete={isAuthor ? handleProblemDelete : undefined}
       />
     </div>
