@@ -12,7 +12,7 @@ import {
   DropdownItem,
 } from 'reactstrap';
 import { signOut } from 'firebase/auth';
-import { auth, db } from '../config/firebase'; // Adjust import path as needed
+import { auth, db } from '../../config/firebase'; // Adjust import path as needed
 import { doc, getDoc } from 'firebase/firestore';
 function NavBar({ isLoggedIn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);

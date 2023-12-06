@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import '../styles/Login.css'; // Import the Login.css file
-import { auth, db } from '../config/firebase';
+import '../../styles/Login.css'; // Import the Login.css file
+import { auth, db } from '../../config/firebase';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,

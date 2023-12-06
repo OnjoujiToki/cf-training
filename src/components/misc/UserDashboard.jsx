@@ -8,10 +8,10 @@ import {
   CardBody,
   CardTitle,
 } from 'reactstrap';
-import RecentSolvedProblems from './DashboardComponents/RecentSolvedProblems';
-import SolveCount from './DashboardComponents/SolveCount';
-import HandleManager from './DashboardComponents/HandleManager';
-import { auth, db } from '../config/firebase';
+import RecentSolvedProblems from '../DashboardComponents/RecentSolvedProblems';
+import SolveCount from '../DashboardComponents/SolveCount';
+import HandleManager from '../DashboardComponents/HandleManager';
+import { auth, db } from '../../config/firebase';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,

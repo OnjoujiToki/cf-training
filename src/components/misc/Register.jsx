@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import '../styles/Register.css'; // Import the Register.css file
-import { auth } from '../config/firebase';
+import '../../styles/Register.css'; // Import the Register.css file
+import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 

@@ -4,7 +4,7 @@ import { auth } from './config/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import CompleteProblems from './components/CompleteProblems';
 import './styles/styles.css';
-import NavBar from './components/NavBar';
+import NavBar from './components/misc/NavBar';
 import Dashboard from './components/Dashboard';
 import Training from './components/TrainingComponents/Training';
 import PlanDetail from './components/TrainingComponents/PlanDetail';

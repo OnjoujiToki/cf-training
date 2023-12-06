@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../config/firebase'; // Adjust import path as needed
 import { doc, getDoc } from 'firebase/firestore';
-import ProblemList from '../ProblemList';
+import ProblemList from '../misc/ProblemList';
 import LoadingComponents from '../misc/LoadingComponents';
 function FavoriteProblems() {
   const [favoriteProblems, setFavoriteProblems] = useState([]);

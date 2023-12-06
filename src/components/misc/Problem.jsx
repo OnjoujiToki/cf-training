@@ -13,8 +13,8 @@ import {
   getDoc,
   arrayRemove,
 } from 'firebase/firestore';
-import { db, auth } from '../config/firebase'; // Adjust the import path
-import './componentsCSS/Problem.css';
+import { db, auth } from '../../config/firebase'; // Adjust the import path
+import '../componentsCSS/Problem.css';
 
 const getDifficultyColor = (rating) => {
   if (rating >= 2400) return 'red';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
-import ProblemList from '../ProblemList';
+import ProblemList from '../misc/ProblemList';
 import '../componentsCSS/PlanDetailCSS.css';
 function PlanDetail() {
   const { planId } = useParams();

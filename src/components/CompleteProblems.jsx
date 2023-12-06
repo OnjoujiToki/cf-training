@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import ProblemList from './ProblemList';
-import Pagination from './Pagination';
+import ProblemList from './misc/ProblemList';
+import Pagination from './misc/Pagination';
 import {
   collection,
   doc,

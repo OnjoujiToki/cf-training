@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Login from './Login';
-import Register from './Register';
-import UserDashboard from './UserDashboard';
+import Login from './misc/Login';
+import Register from './misc/Register';
+import UserDashboard from './misc/UserDashboard';
 
 import { auth } from '../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';

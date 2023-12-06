@@ -10,8 +10,8 @@ import {
   setDoc,
   arrayRemove,
 } from 'firebase/firestore';
-import { db, auth } from '../config/firebase'; // Adjust the import path
-import './componentsCSS/Problem.css';
+import { db, auth } from '../../config/firebase'; // Adjust the import path
+import '../componentsCSS/Problem.css';
 
 function ProblemList({ problems, showTags, listName, onDelete, planId }) {
   const [currentPage, setCurrentPage] = useState(1);

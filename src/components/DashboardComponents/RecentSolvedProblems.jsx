@@ -1,5 +1,5 @@
 import React from 'react';
-import Problem from '../Problem'; // Import the Problem component
+import Problem from '../misc/Problem'; // Import the Problem component
 
 function RecentSolvedProblems({ recentProblems }) {
   return (
