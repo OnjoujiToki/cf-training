@@ -8,9 +8,9 @@ import {
   CardBody,
   CardTitle,
 } from 'reactstrap';
-import RecentSolvedProblems from '../DashboardComponents/RecentSolvedProblems';
-import SolveCount from '../DashboardComponents/SolveCount';
-import HandleManager from '../DashboardComponents/HandleManager';
+import RecentSolvedProblems from './RecentSolvedProblems';
+import SolveCount from './SolveCount';
+import HandleManager from './HandleManager';
 import { auth, db } from '../../config/firebase';
 import {
   signInWithEmailAndPassword,
@@ -18,11 +18,13 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
+import LoadingComponent from '../misc/LoadingComponents';
+
 function UserDashboard() {
   const [handles, setHandles] = useState([]);
   const [newHandle, setNewHandle] = useState('');
   const [recentProblems, setRecentProblems] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   const fetchProblemDetails = async (problemId) => {
     const problemRef = doc(db, 'problems', problemId);
     try {
@@ -163,17 +165,36 @@ function UserDashboard() {
   };
 
   useEffect(() => {
-    const fetchUserHandles = async () => {
+    const fetchUserHandlesAndSolveCount = async () => {
       if (auth.currentUser) {
         const userDocRef = doc(db, 'users', auth.currentUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          setHandles(userDocSnap.data().handles || []);
+        try {
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setHandles(userData.handles || []);
+
+            // Check if solveCount is present in the database
+            if ('solveCount' in userData) {
+              setTotalProblemsSolved(userData.solveCount);
+            } else {
+              // If solveCount is not present, calculate it, update the database, and set it in the state
+              const count = await aggregateProblemsForAllHandles(
+                userData.handles || []
+              );
+              setTotalProblemsSolved(count);
+              await updateDoc(userDocRef, {
+                solveCount: count,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
         }
       }
     };
 
-    fetchUserHandles();
+    fetchUserHandlesAndSolveCount();
   }, []);
 
   const isHandleValid = async (handle) => {
@@ -230,6 +251,43 @@ function UserDashboard() {
   const updateTotalProblemsSolved = async () => {
     const count = await aggregateProblemsForAllHandles(handles);
     setTotalProblemsSolved(count);
+
+    // Update the solveCount in the user's document
+    if (auth.currentUser) {
+      try {
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+        await updateDoc(userDocRef, {
+          solveCount: count, // This will create the field if it doesn't exist
+        });
+      } catch (error) {
+        console.error('Error updating solve count:', error);
+      }
+    }
+  };
+
+  const deleteHandle = async (handleToDelete) => {
+    if (!auth.currentUser) {
+      alert('No user logged in');
+      return;
+    }
+
+    try {
+      // Update Firestore
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userDocRef, {
+        handles: handles.filter((handle) => handle !== handleToDelete),
+      });
+
+      // Update local state
+      setHandles((currentHandles) =>
+        currentHandles.filter((handle) => handle !== handleToDelete)
+      );
+
+      alert('Handle removed successfully');
+    } catch (error) {
+      console.error('Error removing handle:', error);
+      alert('Failed to remove handle');
+    }
   };
 
   return (
@@ -242,6 +300,7 @@ function UserDashboard() {
             newHandle={newHandle}
             setNewHandle={setNewHandle}
             addHandle={addHandle}
+            deleteHandle={deleteHandle}
           />
         </Col>
         <Col md={6}>
