@@ -6,6 +6,8 @@ import {
   Nav,
   NavItem,
   NavLink,
+  NavbarToggler,
+  Collapse,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
@@ -14,7 +16,9 @@ import {
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../config/firebase'; // Adjust import path as needed
 import { doc, getDoc } from 'firebase/firestore';
+import '../componentsCSS/NavBarCSS.css';
 function NavBar({ isLoggedIn }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState('User');
 
@@ -32,6 +36,7 @@ function NavBar({ isLoggedIn }) {
     fetchUserName();
   }, [isLoggedIn]);
 
+  const toggle = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleSignOut = async () => {
@@ -45,52 +50,63 @@ function NavBar({ isLoggedIn }) {
 
   return (
     <Navbar color="light" light expand="md" className="navbar-custom">
-      <NavbarBrand href="/" className="mb-0 h1">
-        Codeforces Problems
-      </NavbarBrand>
-      <Nav className="mr-auto" navbar>
-        <NavItem>
-          <NavLink to="/" tag={Link}>
-            Home
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink to="/problem" tag={Link}>
-            Problem
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink to="/contest" tag={Link}>
-            Jobs
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink to="/training" tag={Link}>
-            Training
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink to="/favorite" tag={Link}>
-            ❤️Favorite
-          </NavLink>
-        </NavItem>
-      </Nav>
-      <Nav navbar>
-        {isLoggedIn ? (
-          <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-            <DropdownToggle caret>{userName || 'Nickname'}</DropdownToggle>
-            <DropdownMenu end>
-              <DropdownItem tag={Link} to="/settings">
-                Settings
-              </DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem onClick={handleSignOut}>Sign Out</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        ) : (
-          <NavItem></NavItem>
-        )}
-      </Nav>
+      <div className="navbar-content">
+        <NavbarBrand href="/" className="mb-0 h1">
+          Codeforces Problems
+        </NavbarBrand>
+        <NavbarToggler onClick={toggle} />
+        <div className="navbar-nav-wrapper">
+          <Collapse isOpen={isOpen} navbar className="w-100">
+            <Nav className="mr-auto" navbar>
+              <NavItem>
+                <NavLink to="/" tag={Link}>
+                  Home
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/problem" tag={Link}>
+                  Problem
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/contest" tag={Link}>
+                  Jobs
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/training" tag={Link}>
+                  Training
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/favorite" tag={Link}>
+                  ❤️ Favorite
+                </NavLink>
+              </NavItem>
+            </Nav>
+          </Collapse>
+        </div>
+        <Nav navbar className="ml-auto">
+          {isLoggedIn ? (
+            <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+              <DropdownToggle caret>{userName || 'Nickname'}</DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem tag={Link} to="/settings">
+                  Settings
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem onClick={handleSignOut}>Sign Out</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <NavItem>
+              <NavLink to="/login" tag={Link}>
+                Log In
+              </NavLink>
+            </NavItem>
+          )}
+        </Nav>
+      </div>
     </Navbar>
   );
 }

@@ -10,6 +10,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import './componentsCSS/PlanDetailCSS.css';
 // import './App.css';
 import LoadingComponent from './misc/LoadingComponents';
 
@@ -52,10 +53,19 @@ function CompleteProblems() {
     return <LoadingComponent />;
   }
   return (
-    <div className="Home">
-      <button onClick={toggleTagsVisibility}>
-        {showTags ? 'Hide All Tags' : 'Show All Tags'}
-      </button>
+    <div className="plan-detail-container">
+      <div className="plan-header">
+        <div className="add-problem-container">
+          {isLoaded && (
+            <button
+              onClick={toggleTagsVisibility}
+              className="add-problem-button">
+              {showTags ? 'Hide All Tags' : 'Show All Tags'}
+            </button>
+          )}
+        </div>
+      </div>
+
       {isLoaded && (
         <ProblemList
           problems={currentProblems}
