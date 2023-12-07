@@ -1,4 +1,5 @@
 # Fall 2023 INFO-6150 Final Project Team 20
+[![wakatime](https://wakatime.com/badge/github/OnjoujiToki/cf-training.svg)](https://wakatime.com/badge/github/OnjoujiToki/cf-training)
 # **Documentation**
 
 ## Team Members
