@@ -27,6 +27,7 @@ function CreatePlan() {
   const [maxRating, setMaxRating] = useState('');
   const [afterContestId, setAfterContestId] = useState('');
   const [numberOfProblems, setNumberOfProblems] = useState('');
+  const [excludeSolved, setExcludeSolved] = useState(false);
 
   const fetchProblemsFromCodeforces = async () => {
     try {
@@ -48,6 +49,29 @@ function CreatePlan() {
       return [];
     }
   };
+  const fetchSolvedProblemsForHandles = async (handles) => {
+    const solvedProblems = new Set();
+    for (const handle of handles) {
+      try {
+        const response = await fetch(
+          `https://codeforces.com/api/user.status?handle=${handle}`
+        );
+        const data = await response.json();
+        if (data.status !== 'OK') {
+          throw new Error('Failed to fetch data for handle: ' + handle);
+        }
+        data.result.forEach((submission) => {
+          if (submission.verdict === 'OK') {
+            const problemId = `${submission.problem.contestId}${submission.problem.index}`;
+            solvedProblems.add(problemId);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching problems for handle:', handle, error);
+      }
+    }
+    return solvedProblems;
+  };
 
   const pickRandomProblems = (problems, count) => {
     const shuffled = problems.sort(() => 0.5 - Math.random());
@@ -61,9 +85,7 @@ function CreatePlan() {
       alert('Please fill in the plan name.');
       return;
     }
-
     let validProblems = [];
-
     if (problemIds) {
       const problemsArray = problemIds.split(',').map((id) => id.trim());
 
@@ -78,11 +100,40 @@ function CreatePlan() {
     }
 
     if (minRating && maxRating && afterContestId && numberOfProblems) {
-      const problemsFromCodeforces = await fetchProblemsFromCodeforces();
-      const randomProblems = pickRandomProblems(
+      let problemsFromCodeforces = await fetchProblemsFromCodeforces();
+      let solvedProblems = new Set();
+
+      if (excludeSolved && auth.currentUser) {
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists() && userDocSnap.data().handles) {
+          solvedProblems = await fetchSolvedProblemsForHandles(
+            userDocSnap.data().handles
+          );
+          problemsFromCodeforces = problemsFromCodeforces.filter(
+            (problem) =>
+              !solvedProblems.has(`${problem.contestId}${problem.index}`)
+          );
+        }
+      }
+
+      let randomProblems = pickRandomProblems(
         problemsFromCodeforces,
         numberOfProblems
       );
+
+      // If the number of random problems is less than required, fetch additional problems
+      while (
+        randomProblems.length < numberOfProblems &&
+        problemsFromCodeforces.length > 0
+      ) {
+        const additionalProblems = pickRandomProblems(
+          problemsFromCodeforces,
+          numberOfProblems - randomProblems.length
+        );
+        randomProblems = [...randomProblems, ...additionalProblems];
+      }
+
       validProblems = [...validProblems, ...randomProblems];
     }
 
@@ -191,6 +242,16 @@ function CreatePlan() {
                 value={numberOfProblems}
                 onChange={(e) => setNumberOfProblems(e.target.value)}
               />
+            </FormGroup>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="checkbox"
+                  checked={excludeSolved}
+                  onChange={(e) => setExcludeSolved(e.target.checked)}
+                />
+                Exclude problems I've solved
+              </Label>
             </FormGroup>
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <Button color="primary" size="lg" onClick={handleSavePlan}>
