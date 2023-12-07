@@ -88,11 +88,7 @@ function NavBar({ isLoggedIn }) {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <NavItem>
-            <NavLink to="/login" tag={Link}>
-              Sign In
-            </NavLink>
-          </NavItem>
+          <NavItem></NavItem>
         )}
       </Nav>
     </Navbar>
