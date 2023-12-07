@@ -1,9 +1,7 @@
 ## To do
 
-1. Finish User Save Function to print user self-define plans
-2. Optimize UI for RecentSolvedProblem.jsx
-3. Add Setting Page to Show Tag or not
-4. Training Plans Pagination
-5. Loading (Hint: use react-strap spinner-border)
-6. Optimize UI for setting page
-7. Optimize handlers update/delete functions
+1. Support Import Function for Plans
+2. Mobile fitting
+3. Training Plans Pagination
+4. CHange title
+5. Refresh home will get lost
