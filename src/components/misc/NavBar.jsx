@@ -61,7 +61,7 @@ function NavBar({ isLoggedIn }) {
         </NavItem>
         <NavItem>
           <NavLink to="/contest" tag={Link}>
-            Contest
+            Jobs
           </NavLink>
         </NavItem>
         <NavItem>
