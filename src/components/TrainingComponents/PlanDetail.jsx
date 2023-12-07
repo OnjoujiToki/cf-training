@@ -4,11 +4,13 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
 import ProblemList from '../misc/ProblemList';
 import '../componentsCSS/PlanDetailCSS.css';
+import LoadingComponent from '../misc/LoadingComponents';
 function PlanDetail() {
   const { planId } = useParams();
   const [plan, setPlan] = useState(null);
   const [problemDetails, setProblemDetails] = useState([]);
   const [showTags, setShowTags] = useState(true); // Default
+
   const handleProblemDelete = async (problemId) => {
     try {
       const updatedProblems = plan.problems.filter((pId) => pId !== problemId);
@@ -85,7 +87,7 @@ function PlanDetail() {
     fetchPlan();
   }, [planId]);
 
-  if (!plan) return <div>Loading...</div>;
+  if (!plan) return <LoadingComponent />;
 
   const isAuthor = auth.currentUser && plan.author_id === auth.currentUser.uid;
 

@@ -98,7 +98,7 @@ function Training() {
       <Row>
         <Col md={6}>
           <Card>
-            <CardHeader className="bg-light">
+            <CardHeader className="bg-light ">
               <h3>Public Training Plans</h3>
             </CardHeader>
             <CardBody>

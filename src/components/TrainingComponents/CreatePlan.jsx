@@ -1,94 +1,205 @@
 import React, { useState } from 'react';
-import { doc, setDoc, collection, getDoc, arrayUnion, updateDoc, serverTimestamp} from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  collection,
+  getDoc,
+  arrayUnion,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import {
+  Card,
+  CardBody,
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+} from 'reactstrap';
 
 function CreatePlan() {
   const [planName, setPlanName] = useState('');
   const [problemIds, setProblemIds] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [minRating, setMinRating] = useState('');
+  const [maxRating, setMaxRating] = useState('');
+  const [afterContestId, setAfterContestId] = useState('');
+  const [numberOfProblems, setNumberOfProblems] = useState('');
 
-    const handleSavePlan = async () => {
-      if (!planName || !problemIds) {
-        alert('Please fill all the fields.');
-        return;
+  const fetchProblemsFromCodeforces = async () => {
+    try {
+      const response = await fetch(
+        `https://codeforces.com/api/problemset.problems`
+      );
+      const data = await response.json();
+      if (data.status !== 'OK') {
+        throw new Error('Failed to fetch problems from Codeforces');
       }
-    
-      const problemsArray = problemIds.split(',').map(id => id.trim());
-      const validProblems = [];
-    
+      return data.result.problems.filter(
+        (problem) =>
+          problem.rating >= minRating &&
+          problem.rating <= maxRating &&
+          problem.contestId > afterContestId
+      );
+    } catch (error) {
+      console.error('Error fetching problems from Codeforces:', error);
+      return [];
+    }
+  };
+
+  const pickRandomProblems = (problems, count) => {
+    const shuffled = problems.sort(() => 0.5 - Math.random());
+    return shuffled
+      .slice(0, count)
+      .map((problem) => `${problem.contestId}${problem.index}`);
+  };
+
+  const handleSavePlan = async () => {
+    if (!planName) {
+      alert('Please fill in the plan name.');
+      return;
+    }
+
+    let validProblems = [];
+
+    if (problemIds) {
+      const problemsArray = problemIds.split(',').map((id) => id.trim());
+
       for (const problemId of problemsArray) {
-        const problemRef = doc(db, "problems", problemId);
+        const problemRef = doc(db, 'problems', problemId);
         const problemSnap = await getDoc(problemRef);
-    
+
         if (problemSnap.exists()) {
           validProblems.push(problemId);
         }
       }
-    
-      const planData = {
-        name: planName,
-        problems: validProblems,
-        private: isPrivate,
-        author_id: auth.currentUser ? auth.currentUser.uid : "anonymous",
-        author_name: auth.currentUser ? (auth.currentUser.displayName || 'Anonymous') : "Anonymous",
-        created_at: serverTimestamp(), // Add server timestamp
-      };
-    
-      // Save the plan
-      const newPlanRef = doc(collection(db, 'plans'));
-      await setDoc(newPlanRef, planData);
-    
-      // Update the user's document
-      if (auth.currentUser) {
-        const userDocRef = doc(db, "users", auth.currentUser.uid);
-        await updateDoc(userDocRef, {
-          plans: arrayUnion(newPlanRef.id) // Add the new plan's ID to the user's plans array
-        });
-      }
-    
-      alert('Plan saved successfully!');
+    }
+
+    if (minRating && maxRating && afterContestId && numberOfProblems) {
+      const problemsFromCodeforces = await fetchProblemsFromCodeforces();
+      const randomProblems = pickRandomProblems(
+        problemsFromCodeforces,
+        numberOfProblems
+      );
+      validProblems = [...validProblems, ...randomProblems];
+    }
+
+    const planData = {
+      name: planName,
+      problems: validProblems,
+      private: isPrivate,
+      author_id: auth.currentUser ? auth.currentUser.uid : 'anonymous',
+      author_name: auth.currentUser
+        ? auth.currentUser.displayName || 'Anonymous'
+        : 'Anonymous',
+      created_at: serverTimestamp(),
     };
-    
+
+    const newPlanRef = doc(collection(db, 'plans'));
+    await setDoc(newPlanRef, planData);
+
+    if (auth.currentUser) {
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userDocRef, {
+        plans: arrayUnion(newPlanRef.id),
+      });
+    }
+
+    alert('Plan saved successfully!');
+  };
 
   return (
-    <div>
-      <Form>
-        <FormGroup>
-          <Label for="planName">Plan Name</Label>
-          <Input
-            type="text"
-            name="planName"
-            id="planName"
-            placeholder="Enter plan name"
-            value={planName}
-            onChange={(e) => setPlanName(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="problemIds">Problem IDs</Label>
-          <Input
-            type="text"
-            name="problemIds"
-            id="problemIds"
-            placeholder="Enter problem IDs separated by commas"
-            value={problemIds}
-            onChange={(e) => setProblemIds(e.target.value)}
-          />
-          <FormText>Example: 173E, 1976E, 1976D</FormText>
-        </FormGroup>
-        <FormGroup check>
-          <Label check>
-            <Input
-              type="checkbox"
-              checked={isPrivate}
-              onChange={(e) => setIsPrivate(e.target.checked)}
-            />
-            Private Plan
-          </Label>
-        </FormGroup>
-        <Button onClick={handleSavePlan}>Save Plan</Button>
-      </Form>
+    <div className="create-plan-container" style={{ padding: '20px' }}>
+      <Card>
+        <CardBody>
+          <Form className="create-plan-form">
+            <h2 style={{ textAlign: 'center' }}>Create a New Training Plan</h2>
+            <FormGroup>
+              <Label for="planName">Plan Name</Label>
+              <Input
+                type="text"
+                name="planName"
+                id="planName"
+                placeholder="Enter plan name"
+                value={planName}
+                onChange={(e) => setPlanName(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="problemIds">Problem IDs</Label>
+              <Input
+                type="text"
+                name="problemIds"
+                id="problemIds"
+                placeholder="e.g., 1001, 1002, 1003"
+                value={problemIds}
+                onChange={(e) => setProblemIds(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="checkbox"
+                  checked={isPrivate}
+                  onChange={(e) => setIsPrivate(e.target.checked)}
+                />
+                Private Plan
+              </Label>
+            </FormGroup>
+            <FormGroup>
+              <Label for="minRating">Minimum Rating</Label>
+              <Input
+                type="number"
+                name="minRating"
+                id="minRating"
+                placeholder="Enter minimum rating"
+                value={minRating}
+                onChange={(e) => setMinRating(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="maxRating">Maximum Rating</Label>
+              <Input
+                type="number"
+                name="maxRating"
+                id="maxRating"
+                placeholder="Enter maximum rating"
+                value={maxRating}
+                onChange={(e) => setMaxRating(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="afterContestId">After Contest ID</Label>
+              <Input
+                type="number"
+                name="afterContestId"
+                id="afterContestId"
+                placeholder="Enter contest ID"
+                value={afterContestId}
+                onChange={(e) => setAfterContestId(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="numberOfProblems">Number of Problems</Label>
+              <Input
+                type="number"
+                name="numberOfProblems"
+                id="numberOfProblems"
+                placeholder="Enter number of problems"
+                value={numberOfProblems}
+                onChange={(e) => setNumberOfProblems(e.target.value)}
+              />
+            </FormGroup>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <Button color="primary" size="lg" onClick={handleSavePlan}>
+                Save Plan
+              </Button>
+            </div>
+          </Form>
+        </CardBody>
+      </Card>
     </div>
   );
 }
