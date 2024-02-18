@@ -2,9 +2,6 @@
 [![wakatime](https://wakatime.com/badge/github/OnjoujiToki/cf-training.svg)](https://wakatime.com/badge/github/OnjoujiToki/cf-training)
 # **Documentation**
 
-## Team Members
-- Bote Wang
-- Zhihao Zhang
 
 ## Technology Stack
 - Frontend: React, HTML, CSS, JavaScript, Bootstrap
